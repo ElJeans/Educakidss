@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.2"/>
+  <title>EducaKids - Aprendizaje Interactivo</title>
+  <style>
+    body {
+  font-family: 'Comic Sans MS', sans-serif;
+  background-image: url('img/fondo.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  text-align: center;
+  padding: 30px;
+}
+    h1 {
+      color: #2d89ef;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #ff9f00;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #e68a00;
+    }
+    .opcion {
+      display: block;
+      margin: 8px auto;
+      padding: 10px;
+      width: 80%;
+      max-width: 300px;
+      background: #f0f0f0;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .opcion:hover {
+      background: #ddd;
+    }
+    .pregunta {
+      background-color: rgba(255, 255, 255, 0.7); /* fondo blanco semitransparente */
+  padding: 8px 12px;
+  border-radius: 10px;
+  display: inline-block;
+    }
+    .puntos {
+  background-color: rgba(255, 255, 255, 0.7); /* fondo blanco semitransparente */
+  padding: 8px 12px;
+  border-radius: 10px;
+  display: inline-block;
+}
+   #materias h2 {
+  background-color: #FFD700; /* dorado sólido */
+  padding: 10px 20px;
+  border-radius: 12px;
+  display: inline-block;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  color: #000; /* texto negro para que contraste bien */
+  font-weight: bold;
+}
+    .encabezado {
+  background-color: #FFD700;
+  padding: 15px 25px;
+  border-radius: 15px;
+  display: inline-block;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+  color: #000;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.encabezado h1, .encabezado p {
+  margin: 0;
+}
+  </style>
+</head>
+<body>
+  <div class="encabezado">
+  <h1>Bienvenido a EducaKids</h1>
+  <p>¡Aprender es divertido!</p>
+</div>
+  <input type="file" accept="image/*" capture="environment" onchange="simularFoto(event)" style="display:none;" id="inputFoto">
+<button onclick="document.getElementById('inputFoto').click()">Tomar foto de mis apuntes</button>
+<br>
+<img id="miniatura" style="display:none; margin-top: 10px; max-width: 200px; border-radius: 10px; border: 2px solid #ccc;" />
+  <button onclick="mostrarMaterias()">Entrar sin registrarse</button>
+
+  <div id="materias" style="display:none;">
+    <h2>Selecciona una materia:</h2>
+    <button onclick="iniciarMateria('matematicas')">Matemáticas</button>
+    <button onclick="iniciarMateria('espanol')">Español</button>
+    <button onclick="iniciarMateria('ciencias')">Ciencias Naturales</button>
+    <button onclick="iniciarMateria('historia')">Historia</button>
+    <button onclick="iniciarMateria('sociales')">Sociales</button>
+    <button onclick="iniciarMateria('ingles')">Inglés</button>
+  </div>
+
+  <div id="zona-juego" style="display:none;">
+    <div class="puntos">Puntos: <span id="puntos">3</span></div>
+    <div id="contenedor-ejercicio"></div>
+  </div>
+
+  <script>
+    const preguntas = {
+      matematicas: [
+        { pregunta: "¿Cuánto es 12 dividido entre 3?", opciones: ["4", "5", "3"], correcta: "4" },
+{ pregunta: "Si tengo 5 decenas, ¿cuántas unidades tengo?", opciones: ["50", "5", "500"], correcta: "50" },
+{ pregunta: "¿Cuál es el número siguiente a 89?", opciones: ["90", "88", "91"], correcta: "90" },
+{ pregunta: "¿Cuántos lados tiene un hexágono?", opciones: ["5", "6", "8"], correcta: "6" },
+{ pregunta: "¿Cuánto es 7 x 6?", opciones: ["42", "36", "48"], correcta: "42" },
+{ pregunta: "¿Cuál número es mayor: 0.5 o 1/4?", opciones: ["0.5", "1/4", "Son iguales"], correcta: "0.5" },
+{ pregunta: "Si tengo 100 pesos y gasto 25, ¿cuánto me queda?", opciones: ["75", "85", "95"], correcta: "75" },
+{ pregunta: "¿Qué número es impar?", opciones: ["8", "10", "7"], correcta: "7" },
+{ pregunta: "¿Cuánto es 9 más 18?", opciones: ["27", "28", "26"], correcta: "27" },
+{ pregunta: "¿Cuánto es 1/2 + 1/2?", opciones: ["1", "1/4", "2"], correcta: "1" },
+{ pregunta: "¿Cuánto es 15 x 3?", opciones: ["45", "50", "40"], correcta: "45" },
+{ pregunta: "¿Cuál es el doble de 23?", opciones: ["46", "22", "45"], correcta: "46" },
+{ pregunta: "¿Cuántos milímetros hay en un centímetro?", opciones: ["100", "10", "1"], correcta: "10" },
+{ pregunta: "¿Cuántos segundos hay en un minuto?", opciones: ["60", "100", "120"], correcta: "60" },
+{ pregunta: "¿Qué número es la raíz cuadrada de 64?", opciones: ["8", "6", "10"], correcta: "8" },
+{ pregunta: "¿Cuál es el área de un cuadrado con lado 4 cm?", opciones: ["16 cm²", "12 cm²", "8 cm²"], correcta: "16 cm²" },
+{ pregunta: "¿Cuánto es 0.5 x 0.2?", opciones: ["0.1", "0.5", "0.2"], correcta: "0.1" },
+{ pregunta: "¿Qué número sigue en la secuencia: 2, 4, 6, ...?", opciones: ["8", "10", "7"], correcta: "8" },
+{ pregunta: "Si tienes 3 grupos de 4 manzanas, ¿cuántas manzanas tienes en total?", opciones: ["12", "9", "10"], correcta: "12" },
+{ pregunta: "¿Cuál es el número que falta en la secuencia: 2, 4, 8, __, 32?", opciones: ["16", "12", "24"], correcta: "16" }
+      ],
+      espanol: [
+        { pregunta: "¿Cuál es el sinónimo de 'enojado'?", opciones: ["triste", "furioso", "feliz"], correcta: "furioso" },
+{ pregunta: "¿Cuál es la forma correcta: 'haiga' o 'haya'?", opciones: ["haiga", "haya", "ninguna"], correcta: "haya" },
+{ pregunta: "¿Qué tipo de texto es una receta de cocina?", opciones: ["Narrativo", "Instructivo", "Descriptivo"], correcta: "Instructivo" },
+{ pregunta: "¿Qué pronombre corresponde a 'María y yo'?", opciones: ["Ellos", "Nosotros", "Ustedes"], correcta: "Nosotros" },
+{ pregunta: "¿Qué es una fábula?", opciones: ["Un texto con rima", "Un cuento con animales que enseñan una lección", "Un poema"], correcta: "Un cuento con animales que enseñan una lección" },
+{ pregunta: "¿Cuál palabra tiene diptongo?", opciones: ["cielo", "río", "poeta"], correcta: "cielo" },
+{ pregunta: "¿Qué tipo de palabra es 'inteligente'?", opciones: ["Adjetivo", "Verbo", "Sustantivo"], correcta: "Adjetivo" },
+{ pregunta: "¿Cuál es la forma correcta de escribir una fecha?", opciones: ["10 Enero, 2025", "10 de enero de 2025", "10 enero 2025"], correcta: "10 de enero de 2025" },
+{ pregunta: "¿Qué signo se usa para expresar sorpresa?", opciones: ["¿", "¡", ":"], correcta: "¡" },
+{ pregunta: "¿Qué significa 'literal' en una lectura?", opciones: ["Que es inventado", "Que es exactamente como se dice", "Que es un resumen"], correcta: "Que es exactamente como se dice" },
+{ pregunta: "¿Cuál es el antónimo de 'feliz'?", opciones: ["contento", "alegre", "triste"], correcta: "triste" },
+{ pregunta: "¿Cuál palabra es un adjetivo?", opciones: ["rápido", "correr", "mesa"], correcta: "rápido" },
+{ pregunta: "¿Cuál es una oración completa?", opciones: ["El perro", "Corre rápido", "Mesa grande"], correcta: "Corre rápido" },
+{ pregunta: "¿Cuál es la sílaba tónica en 'camión'?", opciones: ["ca", "mión", "no tiene"], correcta: "mión" },
+{ pregunta: "¿Qué signo falta en la oración: ¿Cómo estás", opciones: ["¡", "¿", "?"], correcta: "¿" },
+{ pregunta: "¿Cuál de estas palabras es un sustantivo?", opciones: ["libro", "leer", "rápido"], correcta: "libro" },
+{ pregunta: "¿Qué tiempo verbal es: 'Yo comí arroz'?", opciones: ["Presente", "Pasado", "Futuro"], correcta: "Pasado" },
+{ pregunta: "¿Cuál es una conjunción?", opciones: ["y", "el", "correr"], correcta: "y" },
+{ pregunta: "¿Qué tipo de palabra es 'ayer'?", opciones: ["Adverbio de tiempo", "Sustantivo", "Verbo"], correcta: "Adverbio de tiempo" },
+{ pregunta: "¿Qué signo se usa para hacer una pregunta?", opciones: ["!", "¿?", ":"], correcta: "¿?" }
+      ],
+      ciencias: [
+        { pregunta: "¿Cuál es la función principal del corazón?", opciones: ["Pensar", "Bombear sangre", "Digestionar alimentos"], correcta: "Bombear sangre" },
+{ pregunta: "¿Qué órgano se encarga de la digestión de los alimentos?", opciones: ["Pulmones", "Estómago", "Cerebro"], correcta: "Estómago" },
+{ pregunta: "¿Qué planeta es conocido como el planeta rojo?", opciones: ["Venus", "Marte", "Júpiter"], correcta: "Marte" },
+{ pregunta: "¿Qué parte de la planta realiza la fotosíntesis?", opciones: ["Raíz", "Tallo", "Hoja"], correcta: "Hoja" },
+{ pregunta: "¿Qué necesitan las plantas para hacer fotosíntesis?", opciones: ["Luz solar, agua y dióxido de carbono", "Fuego y tierra", "Solamente tierra"], correcta: "Luz solar, agua y dióxido de carbono" },
+{ pregunta: "¿Qué gas respiramos del aire que es vital para vivir?", opciones: ["Oxígeno", "Dióxido de carbono", "Nitrógeno"], correcta: "Oxígeno" },
+{ pregunta: "¿Qué función tienen los huesos en el cuerpo humano?", opciones: ["Hacen la digestión", "Sostienen y protegen el cuerpo", "Ayudan a respirar"], correcta: "Sostienen y protegen el cuerpo" },
+{ pregunta: "¿Cómo se llama el cambio de sólido a líquido?", opciones: ["Evaporación", "Fusión", "Condensación"], correcta: "Fusión" },
+{ pregunta: "¿Cuál es el planeta más cercano al Sol?", opciones: ["Tierra", "Venus", "Mercurio"], correcta: "Mercurio" },
+{ pregunta: "¿Qué animal es un mamífero?", opciones: ["Gallina", "Ballena", "Cocodrilo"], correcta: "Ballena" },
+{ pregunta: "¿Qué sistema del cuerpo se encarga de transportar la sangre?", opciones: ["Sistema nervioso", "Sistema circulatorio", "Sistema digestivo"], correcta: "Sistema circulatorio" },
+{ pregunta: "¿Qué sucede cuando el agua se calienta hasta hervir?", opciones: ["Se congela", "Se evapora", "Se condensa"], correcta: "Se evapora" },
+{ pregunta: "¿Cuál es la principal fuente de energía para los seres vivos?", opciones: ["La luna", "El fuego", "El sol"], correcta: "El sol" },
+{ pregunta: "¿Qué parte del cuerpo controla todo lo que hacemos?", opciones: ["Estómago", "Cerebro", "Pulmones"], correcta: "Cerebro" },
+{ pregunta: "¿Qué animal pone huevos y vuela?", opciones: ["Ballena", "Murciélago", "Águila"], correcta: "Águila" },
+{ pregunta: "¿Qué órgano usamos para respirar?", opciones: ["Corazón", "Pulmones", "Riñones"], correcta: "Pulmones" },
+{ pregunta: "¿Qué sucede con las sombras cuando el sol está alto en el cielo?", opciones: ["Desaparecen", "Son más largas", "Son más cortas"], correcta: "Son más cortas" },
+{ pregunta: "¿Qué nombre recibe el proceso por el cual el agua de lluvia vuelve a los ríos?", opciones: ["Evaporación", "Precipitación", "Escurrimiento"], correcta: "Escurrimiento" },
+{ pregunta: "¿Qué tipo de animal es el tiburón?", opciones: ["Mamífero", "Anfibio", "Pez"], correcta: "Pez" },
+{ pregunta: "¿Qué función cumplen las raíces en una planta?", opciones: ["Realizan fotosíntesis", "Absorben agua y nutrientes", "Dan flores"], correcta: "Absorben agua y nutrientes" }
+      ],
+      historia: [
+        { pregunta: "¿En qué año comenzó la Independencia de México?", opciones: ["1810", "1821", "1910"], correcta: "1810" },
+{ pregunta: "¿Qué personaje dio el Grito de Dolores?", opciones: ["Benito Juárez", "Miguel Hidalgo", "José María Morelos"], correcta: "Miguel Hidalgo" },
+{ pregunta: "¿Qué se firmó en 1821 en México?", opciones: ["Plan de Ayala", "Plan de Iguala", "Constitución de 1917"], correcta: "Plan de Iguala" },
+{ pregunta: "¿Quién fue Porfirio Díaz?", opciones: ["Un revolucionario", "Un dictador y presidente", "Un sacerdote"], correcta: "Un dictador y presidente" },
+{ pregunta: "¿Qué evento inició la Revolución Mexicana?", opciones: ["El Grito de Dolores", "El Plan de San Luis", "La Constitución de 1857"], correcta: "El Plan de San Luis" },
+{ pregunta: "¿Qué civilización construyó Chichén Itzá?", opciones: ["Azteca", "Olmeca", "Maya"], correcta: "Maya" },
+{ pregunta: "¿Qué culturas formaron la triple alianza?", opciones: ["Zapotecas, Mixtecas, Olmecas", "Mexicas, Texcocanos, Tepanecas", "Mayas, Totonacas, Tlaxcaltecas"], correcta: "Mexicas, Texcocanos, Tepanecas" },
+{ pregunta: "¿Quién fue Benito Juárez?", opciones: ["Un poeta", "Un presidente indígena", "Un conquistador"], correcta: "Un presidente indígena" },
+{ pregunta: "¿Qué país conquistó México en 1521?", opciones: ["Francia", "España", "Inglaterra"], correcta: "España" },
+{ pregunta: "¿Qué hizo Lázaro Cárdenas?", opciones: ["Vendió Pemex", "Expropió el petróleo", "Escribió la Constitución"], correcta: "Expropió el petróleo" },
+{ pregunta: "¿Qué fue la Revolución Mexicana?", opciones: ["Una fiesta", "Un conflicto armado por justicia social y democracia", "Una guerra contra otro país"], correcta: "Un conflicto armado por justicia social y democracia" },
+{ pregunta: "¿Quién fue Miguel Hidalgo?", opciones: ["Un pintor famoso", "El iniciador de la lucha de Independencia en México", "Un presidente reciente"], correcta: "El iniciador de la lucha de Independencia en México" },
+{ pregunta: "¿Qué representa el 20 de noviembre en México?", opciones: ["El Día de la Bandera", "El inicio de la Revolución Mexicana", "La independencia"], correcta: "El inicio de la Revolución Mexicana" },
+{ pregunta: "¿Cuál fue el objetivo de los insurgentes en la Independencia?", opciones: ["Conquistar España", "Liberar a México del dominio español", "Cambiar de religión"], correcta: "Liberar a México del dominio español" },
+{ pregunta: "¿Qué cultura construyó Teotihuacán?", opciones: ["Aztecas", "Mayas", "No se sabe con exactitud"], correcta: "No se sabe con exactitud" },
+{ pregunta: "¿Quién fue José María Morelos?", opciones: ["Un actor", "Un líder insurgente que continuó la lucha de Hidalgo", "Un presidente moderno"], correcta: "Un líder insurgente que continuó la lucha de Hidalgo" },
+{ pregunta: "¿Qué ocurrió en 1521 en México?", opciones: ["Se fundó la UNAM", "Cayó Tenochtitlán y terminó el Imperio Mexica", "Se descubrió América"], correcta: "Cayó Tenochtitlán y terminó el Imperio Mexica" },
+{ pregunta: "¿Cuál era el objetivo de los misioneros españoles?", opciones: ["Enseñar religión católica a los indígenas", "Hacer comercio", "Construir castillos"], correcta: "Enseñar religión católica a los indígenas" },
+{ pregunta: "¿Qué significa la palabra 'mestizaje' en la historia de México?", opciones: ["La mezcla de culturas y razas tras la conquista", "La creación de leyes nuevas", "Un tipo de arte"], correcta: "La mezcla de culturas y razas tras la conquista" },
+{ pregunta: "¿Qué simboliza el escudo de la bandera de México?", opciones: ["Una historia azteca sobre el águila y la serpiente", "Un partido político", "Un animal mítico"], correcta: "Una historia azteca sobre el águila y la serpiente" }
+      ],
+      sociales: [
+        { pregunta: "¿Qué es una sociedad?", opciones: ["Un grupo de animales", "Un grupo de personas que conviven y se organizan", "Un grupo de computadoras"], correcta: "Un grupo de personas que conviven y se organizan" },
+{ pregunta: "¿Qué hace un presidente municipal?", opciones: ["Da clases", "Gobierna una ciudad o municipio", "Conduce un programa de TV"], correcta: "Gobierna una ciudad o municipio" },
+{ pregunta: "¿Qué es una costumbre?", opciones: ["Una prenda de vestir", "Algo que se repite frecuentemente en una comunidad", "Una regla del gobierno"], correcta: "Algo que se repite frecuentemente en una comunidad" },
+{ pregunta: "¿Qué es un derecho?", opciones: ["Un castigo", "Una obligación", "Algo que todas las personas deben tener, como salud y educación"], correcta: "Algo que todas las personas deben tener, como salud y educación" },
+{ pregunta: "¿Qué es una obligación ciudadana?", opciones: ["Dormir mucho", "Participar en la sociedad y respetar las leyes", "Viajar por el mundo"], correcta: "Participar en la sociedad y respetar las leyes" },
+{ pregunta: "¿Qué es una comunidad rural?", opciones: ["Una ciudad grande", "Una zona con pocos habitantes y más naturaleza", "Un país"], correcta: "Una zona con pocos habitantes y más naturaleza" },
+{ pregunta: "¿Qué hace la policía?", opciones: ["Construye casas", "Cuida el orden y la seguridad", "Vende alimentos"], correcta: "Cuida el orden y la seguridad" },
+{ pregunta: "¿Qué es una regla?", opciones: ["Una herramienta de dibujo", "Una norma que guía el comportamiento", "Una ley muy estricta"], correcta: "Una norma que guía el comportamiento" },
+{ pregunta: "¿Por qué es importante el respeto?", opciones: ["Para evitar peleas y convivir en armonía", "Para ganar dinero", "Para tener poder"], correcta: "Para evitar peleas y convivir en armonía" },
+{ pregunta: "¿Qué es un servicio público?", opciones: ["Un regalo", "Un trabajo que beneficia a todos, como la luz y el agua", "Una tienda"], correcta: "Un trabajo que beneficia a todos, como la luz y el agua" }, { pregunta: "¿Qué es la democracia?", opciones: ["Un tipo de comida", "Un gobierno donde las personas eligen a sus representantes", "Una celebración"], correcta: "Un gobierno donde las personas eligen a sus representantes" },
+{ pregunta: "¿Qué es un ciudadano?", opciones: ["Una persona que vive en una ciudad y tiene derechos y obligaciones", "Un animal doméstico", "Un turista"], correcta: "Una persona que vive en una ciudad y tiene derechos y obligaciones" },
+{ pregunta: "¿Qué institución da seguridad a los ciudadanos?", opciones: ["La biblioteca", "La policía", "El zoológico"], correcta: "La policía" },
+{ pregunta: "¿Qué es una tradición?", opciones: ["Una ley nueva", "Una actividad cultural que se repite con el tiempo", "Un uniforme"], correcta: "Una actividad cultural que se repite con el tiempo" },
+{ pregunta: "¿Qué significa votar?", opciones: ["Jugar", "Elegir a alguien para que nos represente", "Obedecer órdenes"], correcta: "Elegir a alguien para que nos represente" },
+{ pregunta: "¿Qué es la identidad cultural?", opciones: ["El número de una persona", "La forma en que se visten todos igual", "Conjunto de costumbres, idioma y tradiciones que comparten las personas"], correcta: "Conjunto de costumbres, idioma y tradiciones que comparten las personas" },
+{ pregunta: "¿Qué es un servicio de salud?", opciones: ["Un hospital o clínica que atiende enfermedades", "Una tienda de ropa", "Un restaurante saludable"], correcta: "Un hospital o clínica que atiende enfermedades" },
+{ pregunta: "¿Qué es el medio ambiente?", opciones: ["El clima solamente", "El lugar donde vivimos con plantas, animales y personas", "Una red social"], correcta: "El lugar donde vivimos con plantas, animales y personas" },
+{ pregunta: "¿Por qué es importante reciclar?", opciones: ["Para tener más basura", "Para cuidar el medio ambiente y reutilizar recursos", "Para hacer juguetes"], correcta: "Para cuidar el medio ambiente y reutilizar recursos" },
+{ pregunta: "¿Qué es un símbolo patrio?", opciones: ["Una señal de tráfico", "Una imagen que representa a un país, como la bandera", "Una foto de familia"], correcta: "Una imagen que representa a un país, como la bandera" }
+      ],
+      ingles: [
+        { pregunta: "What color is the sky on a sunny day?", opciones: ["Blue", "Green", "Red"], correcta: "Blue" },
+  { pregunta: "What is the opposite of 'big'?", opciones: ["Small", "Tall", "Wide"], correcta: "Small" },
+  { pregunta: "How do you say 'gato' in English?", opciones: ["Cat", "Dog", "Fish"], correcta: "Cat" },
+  { pregunta: "Which one is a fruit?", opciones: ["Apple", "Table", "Car"], correcta: "Apple" },
+  { pregunta: "What do you use to write?", opciones: ["Pencil", "Spoon", "Chair"], correcta: "Pencil" },
+  { pregunta: "What is the number after ten?", opciones: ["Eleven", "Nine", "Twenty"], correcta: "Eleven" },
+  { pregunta: "Which animal says 'woof'?", opciones: ["Dog", "Cat", "Cow"], correcta: "Dog" },
+  { pregunta: "What day comes after Monday?", opciones: ["Tuesday", "Sunday", "Friday"], correcta: "Tuesday" },
+  { pregunta: "Which one is a body part?", opciones: ["Hand", "Hat", "Book"], correcta: "Hand" },
+  { pregunta: "What is the opposite of 'hot'?", opciones: ["Cold", "Slow", "Fast"], correcta: "Cold" },
+  { pregunta: "What is the English word for 'escuela'?", opciones: ["School", "Home", "Market"], correcta: "School" },
+  { pregunta: "What color is a banana?", opciones: ["Yellow", "Blue", "Brown"], correcta: "Yellow" },
+  { pregunta: "What do you wear on your feet?", opciones: ["Shoes", "Glasses", "Hat"], correcta: "Shoes" },
+  { pregunta: "How do you say 'gracias' in English?", opciones: ["Thank you", "Please", "Hello"], correcta: "Thank you" },
+  { pregunta: "Which animal is very big and gray?", opciones: ["Elephant", "Cat", "Duck"], correcta: "Elephant" },
+  { pregunta: "What do you drink when you are thirsty?", opciones: ["Water", "Sand", "Paper"], correcta: "Water" },
+  { pregunta: "What is the English word for 'libro'?", opciones: ["Book", "Pen", "Bag"], correcta: "Book" },
+  { pregunta: "What do bees make?", opciones: ["Honey", "Milk", "Bread"], correcta: "Honey" },
+  { pregunta: "Which one is a vegetable?", opciones: ["Carrot", "Cookie", "Soda"], correcta: "Carrot" },
+  { pregunta: "What do you see in the sky at night?", opciones: ["Stars", "Shoes", "Trees"], correcta: "Stars" }
+      ]
+    };
+
+    let puntos = 3;
+    let materiaActual = "";
+    let preguntasActuales = [];
+    let indice = 0;
+
+    function mostrarMaterias() {
+      document.getElementById("materias").style.display = "block";
+    }
+
+    function iniciarMateria(materia) {
+      materiaActual = materia;
+      puntos = 3;
+      indice = 0;
+      preguntasActuales = [...preguntas[materia]].sort(() => Math.random() - 0.5); // Randomizar preguntas
+      document.getElementById("puntos").textContent = puntos;
+      document.getElementById("materias").style.display = "none";
+      document.getElementById("zona-juego").style.display = "block";
+      mostrarEjercicio();
+    }
+
+    function mostrarEjercicio() {
+      const contenedor = document.getElementById("contenedor-ejercicio");
+      contenedor.innerHTML = "";
+
+      if (indice >= preguntasActuales.length) {
+        contenedor.innerHTML = `<h2>¡Terminaste los ejercicios!</h2><p>Puntos finales: ${puntos}</p><button onclick="reiniciar()">Volver</button>`;
+        return;
+      }
+
+      const ejercicio = preguntasActuales[indice];
+      const opcionesRandom = [...ejercicio.opciones].sort(() => Math.random() - 0.5);
+
+      const preguntaElem = document.createElement("div");
+      preguntaElem.className = "pregunta";
+      preguntaElem.textContent = ejercicio.pregunta;
+      contenedor.appendChild(preguntaElem);
+
+      opcionesRandom.forEach(op => {
+        const btn = document.createElement("div");
+        btn.className = "opcion";
+        btn.textContent = op;
+        btn.onclick = () => verificarRespuesta(op, ejercicio.correcta);
+        contenedor.appendChild(btn);
+      });
+    }
+
+    function verificarRespuesta(respuesta, correcta) {
+      if (respuesta === correcta) {
+        puntos++;
+      } else {
+        puntos--;
+      }
+
+      if (puntos <= 0) {
+        alert("¡Perdiste todos los puntos! Reiniciando ejercicios.");
+        iniciarMateria(materiaActual);
+        return;
+      }
+
+      document.getElementById("puntos").textContent = puntos;
+      indice++;
+      mostrarEjercicio();
+    }
+
+    function reiniciar() {
+      document.getElementById("zona-juego").style.display = "none";
+      document.getElementById("materias").style.display = "block";
+    }
+    function simularFoto(event) {
+  const archivo = event.target.files[0];
+  if (archivo) {
+    const lector = new FileReader();
+    lector.onload = function(e) {
+      const img = document.getElementById('miniatura');
+      img.src = e.target.result;
+      img.style.display = 'block';
+    };
+    lector.readAsDataURL(archivo);
+
+    alert("¡Foto tomada! Generando preguntas a partir de tus apuntes...");
+    setTimeout(() => {
+      alert("¡Listo! Ya puedes comenzar con tus ejercicios.");
+    }, 2000);
+  }
+}
+  </script>
+</body>
+</html>
